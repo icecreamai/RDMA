@@ -1,4 +1,24 @@
-[TOC]
+- [RDMA-example学习笔记](#rdma-example学习笔记)
+	- [项目结构](#项目结构)
+	- [文件执行流](#文件执行流)
+		- [server执行流](#server执行流)
+			- [1. 获取监听IP地址与端口](#1-获取监听ip地址与端口)
+			- [2. 启动监听程序与等待client链接](#2-启动监听程序与等待client链接)
+			- [3. 创建与client端传来的QP对应的QP](#3-创建与client端传来的qp对应的qp)
+			- [4. 注册接收client元数据的内存区域client\_metadata\_mr、创建接收工作请求，接受来自client端的链接请求](#4-注册接收client元数据的内存区域client_metadata_mr创建接收工作请求接受来自client端的链接请求)
+			- [5. 与client端交换元数据](#5-与client端交换元数据)
+			- [6. 断开连接](#6-断开连接)
+		- [client执行流](#client执行流)
+			- [1. 获得目标服务器的通信地址与所需传输的数据](#1-获得目标服务器的通信地址与所需传输的数据)
+			- [2. 链接前对RDMA通信所需的各项资源进行准备](#2-链接前对rdma通信所需的各项资源进行准备)
+			- [3. 注册server端元数据接收内存区域server\_metadata\_mr与创建接收工作请求](#3-注册server端元数据接收内存区域server_metadata_mr与创建接收工作请求)
+			- [4. 与server端建立连接](#4-与server端建立连接)
+			- [5. 与server端交换元数据](#5-与server端交换元数据)
+			- [6. cilent端对server端的远程数据访问](#6-cilent端对server端的远程数据访问)
+			- [7. 验证通信正常](#7-验证通信正常)
+			- [8. 断开链接](#8-断开链接)
+	- [结语](#结语)
+
 # RDMA-example学习笔记
 ---
 &emsp; 该项目来源于github开源项目[rdma-example](https://github.com/animeshtrivedi/rdma-example)，项目使用RDMA开发库librdmacm与libverbs分别完成了服务器与客户端之间的链接建立与数据访问，这其中涉及了RDMA的四项基本操作send/receive、write/read。在结合[rdma-core源码](https://github.com/linux-rdma/rdma-core)的同时对此项目进行解构能够有效加深初学者对RDMA的整体理解。以下是我对这个项目的学习笔记。
